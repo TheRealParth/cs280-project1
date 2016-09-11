@@ -1,0 +1,76 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		B2C5C9CC1D855270009B6A29 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		B2C5C9CD1D855270009B6A29 /* main.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = main.hpp; sourceTree = "<group>"; };
+		B2C5C9CE1D85A566009B6A29 /* input.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		B2C5C9C51D855254009B6A29 = {
+			isa = PBXGroup;
+			children = (
+				B2C5C9CE1D85A566009B6A29 /* input.txt */,
+				B2C5C9CC1D855270009B6A29 /* main.cpp */,
+				B2C5C9CD1D855270009B6A29 /* main.hpp */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		B2C5C9C61D855254009B6A29 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0730;
+			};
+			buildConfigurationList = B2C5C9C91D855254009B6A29 /* Build configuration list for PBXProject "CS280 proj 1" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = B2C5C9C51D855254009B6A29;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		B2C5C9CA1D855254009B6A29 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		B2C5C9CB1D855254009B6A29 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B2C5C9C91D855254009B6A29 /* Build configuration list for PBXProject "CS280 proj 1" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B2C5C9CA1D855254009B6A29 /* Debug */,
+				B2C5C9CB1D855254009B6A29 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B2C5C9C61D855254009B6A29 /* Project object */;
+}
