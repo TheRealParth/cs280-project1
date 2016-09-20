@@ -18,7 +18,7 @@ string line;
 string output;
 string space = " ";
 string rawInput = "";
-string *words;
+
 
 regex newLineToken ("^\\.ll N");
 regex dotLineToken ("^\\..+");
@@ -29,7 +29,7 @@ int isNewParagraph = 0;
 int lineNum = 0;
 int wordCount = 0;
 int spaceCount = 0;
-int lineLength = 20;
+
 
 //USE LATER
 //        if((in[i] == "<") && (i < in.length() - 2)){
@@ -38,27 +38,36 @@ int lineLength = 20;
 //            }
 //        }
 
-string splitWord(string in){
+string *splitWord(string in, int lineLength){
     int r = in.length() % lineLength;
     int divider = in.length()/lineLength;
-    string newWord="";
     
-    for(int i = 0; i < divider; i++ ){
-        for(int j = (lineLength * i); j < (lineLength * divider -1); j++){
-            newWord+= in[j];
+    string *newWord;
+    if(r>0) newWord = new string[divider + 1];
+    else newWord = new string[divider];
+    
+    
+    for(int i = 0; i < divider-1; i++ ){
+        for(int j = lineLength*(i-1); j < lineLength; j++){
+            newWord[i] += in[j];
+            
         }
-        newWord += "-\n";
-        cout << newWord;
+        if((i % lineLength) == 0) {
+            newWord[i] += "-\n";
+        }
+        
     }
-
-    cout << "\n Remainder: " << r;
-    cout << "\n Divider: " << divider;
     
-    return in;
+    cout << "\n Remainder: " << r;
+    cout << "\n Divider: " << divider << "\n";
+    
+    return newWord;
 }
 
+
 //Breaks up the string into a string array of words
-void getWords(string in){
+string *getWords(string in){
+    
     int isWord = 1;
     
     //Count words and spaces;
@@ -83,7 +92,7 @@ void getWords(string in){
     }
     
     //Create an array of words
-    words = new string[wordCount];
+    string *words = new string[wordCount];
     isWord = 1;
     int k = 0;
     words[k]="";
@@ -102,6 +111,7 @@ void getWords(string in){
             words[k] += in[j];
         }
     }
+    return words;
 }
 
 //string finalOutput(string in){
@@ -109,6 +119,8 @@ void getWords(string in){
 //}
 
 int main (int argc, const char * argv[]) {
+    int lineLength = 20;
+    
     //Check if user has input file name...
     if(argc < 2){
         cout << "Missing filename.\n\n";
@@ -145,10 +157,17 @@ int main (int argc, const char * argv[]) {
         }
         file.close();
     } else cout << "Unable to open file";
-     getWords(rawInput);
+     string *words = getWords(rawInput);
     
     for(int i = 0; i < wordCount; i++){
-        if(words[i].length() > lineLength) words[i] = splitWord(words[i]);
+        if(words[i].length() > lineLength)
+        {
+            string *split = splitWord(words[i], lineLength);
+            for(int j=0; j<(sizeof(split[0])/sizeof(split)); j++){
+                cout << split[j];
+            }
+            
+        }
         else
         cout << words[i] + space;
     }
