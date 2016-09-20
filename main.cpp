@@ -16,42 +16,92 @@ using namespace std;
 
 string line;
 string output;
+string space = " ";
 string rawInput = "";
+string *words;
 
 regex newLineToken ("^\\.ll N");
 regex dotLineToken ("^\\..+");
-regex findWords ("\\S+");
-smatch wordResults;
+regex newParagraphToken ("<p>");
 
 
 int isNewParagraph = 0;
 int lineNum = 0;
 int wordCount = 0;
 int spaceCount = 0;
-int lineLength = 60;
+int lineLength = 20;
 
-
-string getWords(string in){
-    int k = 0;
-    string currentWord =  "";
-    regex_search(in, wordResults, findWords);
-//    for(int i = 0; i < in.length(); i++){
-////        if((in[i] == "<") && (i < in.length() - 2)){
-////            if((in[i+1] == "p") && (in[i+2]==">")){
-////                
-////            }
-////        }
-//        if(in[i] == " "){
-//            currentWord = "";
-//            spaceCount++;
-//            k++;
-//            continue;
+//USE LATER
+//        if((in[i] == "<") && (i < in.length() - 2)){
+//            if((in[i+1] == "p") && (in[i+2]==">")){
+//                
+//            }
 //        }
-//    }
-    for(int i=0; i< wordResults.length(); i++){
-        cout << wordResults[i];
+
+string splitWord(string in){
+    int r = in.length() % lineLength;
+    int divider = in.length()/lineLength;
+    string newWord="";
+    
+    for(int i = 0; i < divider; i++ ){
+        for(int j = (lineLength * i); j < (lineLength * divider -1); j++){
+            newWord+= in[j];
+        }
+        newWord += "-\n";
+        cout << newWord;
     }
+
+    cout << "\n Remainder: " << r;
+    cout << "\n Divider: " << divider;
+    
     return in;
+}
+
+//Breaks up the string into a string array of words
+void getWords(string in){
+    int isWord = 1;
+    
+    //Count words and spaces;
+    for(int i = 0; i < in.length(); i++){
+        if(in[i] == ' '){
+            if(isWord){
+                isWord = 0;
+                wordCount++;
+            }
+            spaceCount++;
+            continue;
+        }
+        isWord = 1;
+    }
+    cout << "\nWord count: " << wordCount;
+    cout << "\nSpace count: " << spaceCount << "\n";
+    
+    //Set the base space distance between words based on the amount of evenly divisible spaces
+    int wordGap = spaceCount/wordCount;
+    for(int i = 1; i < wordGap; i ++){
+        space += " ";
+    }
+    
+    //Create an array of words
+    words = new string[wordCount];
+    isWord = 1;
+    int k = 0;
+    words[k]="";
+    for(int j = 0; j < in.length(); j++){
+        if(in[j] == ' '){
+            if(isWord == 1){
+                isWord = 0;
+                if(k< wordCount)
+                k++;
+                words[k]="";
+            } else {
+                continue;
+            }
+        } else {
+            isWord = 1;
+            words[k] += in[j];
+        }
+    }
 }
 
 //string finalOutput(string in){
@@ -69,7 +119,7 @@ int main (int argc, const char * argv[]) {
         cout << "Line length is too small.\n\n";
         return 0;
     }
-    
+
     cout << "\nReading file: " << argv[1];
     cout << "\n\n";
     
@@ -79,7 +129,7 @@ int main (int argc, const char * argv[]) {
     //Print original data and unformat most of the input.
     if (file.is_open()) {
         while ( getline (file,line) ) {
-            if (regex_match(line,newLineToken) && (isNewParagraph == 0)) {
+            if (regex_match(line,newLineToken) && (isNewParagraph == 0) && (lineNum > 0)) {
                 rawInput += "<p>";
                 isNewParagraph = 1;
                 continue;
@@ -87,14 +137,21 @@ int main (int argc, const char * argv[]) {
                 continue;
             } else if (regex_match(line,dotLineToken))  {
                 continue;
-            } else {
+            }else {
                 rawInput += line + ' ';
                 isNewParagraph = 0;
             }
+            lineNum++;
         }
         file.close();
     } else cout << "Unable to open file";
-    getWords(rawInput);
+     getWords(rawInput);
+    
+    for(int i = 0; i < wordCount; i++){
+        if(words[i].length() > lineLength) words[i] = splitWord(words[i]);
+        else
+        cout << words[i] + space;
+    }
     
     //Function to separate words into an array and count spaces.
     

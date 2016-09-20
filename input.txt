@@ -1,5 +1,11 @@
+.ll N
 Screen door slams. Mary’s
 dress
+.ll N
+.ll N
 sways. Like a vision she dances
 across the porch as the
+.ll N
 radio plays.
+razzmatazz
+StarttazzrazzmatONErazzmatazzrazzrTWOmatazzrazzmatazzraTHREEtazzrazzmatEnd
