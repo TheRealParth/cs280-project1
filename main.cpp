@@ -11,6 +11,8 @@
 #include <fstream>
 #include <string>
 #include <regex>
+#include <stdlib.h>     /* srand, rand */
+
 using namespace std;
 
 
@@ -19,43 +21,28 @@ string output;
 string space = " ";
 string rawInput = "";
 
-
-regex newLineToken ("^\\.ll N");
-regex dotLineToken ("^\\..+");
-regex newParagraphToken ("<p>");
-
+//regex newParagraphToken ("<p>");
+regex wordReg ("\\S+\\s?");
 
 int isNewParagraph = 0;
 int lineNum = 0;
 int wordCount = 0;
 int spaceCount = 0;
+int rSpaces = 0;
 
-
-//USE LATER
-//        if((in[i] == "<") && (i < in.length() - 2)){
-//            if((in[i+1] == "p") && (in[i+2]==">")){
-//                
-//            }
-//        }
-
-string *splitWord(string in, int lineLength){
+void splitWord(string in, int lineLength){
     lineLength = lineLength - 1;
     int r = in.length() % lineLength;
     int lineCount = in.length()/lineLength;
-    
-    cout << lineCount;
-    
     
         //if there is 1 character left, it will be appended at the end of
         //the last line instead of the dash, if there are more add another line.
         if(r > 1){
             lineCount++;
         }
-        
+    
         string *newWord = new string[lineCount];
-        cout << "\nr: " << r;
-        cout << "\nlineCount: " << lineCount << "\n";
-        cout << sizeof(newWord)/sizeof(newWord[0]) << "\n";
+    
         int pos = 0;
 
         for(int i = 0; i < lineCount; i++){
@@ -77,14 +64,10 @@ string *splitWord(string in, int lineLength){
         if(r < 1){
             
         }
-        
-        cout << "\n Remainder: " << r;
-        cout << "\n Divider: " << lineCount << "\n\n";
+        //print the split array
         for(int j=0; j< lineCount; j++){
                             cout << newWord[j] << "\n";
         }
-        
-        return newWord;
 }
 
 
@@ -105,11 +88,12 @@ string *getWords(string in){
         }
         isWord = 1;
     }
-    cout << "\nWord count: " << wordCount;
-    cout << "\nSpace count: " << spaceCount << "\n";
     
     //Set the base space distance between words based on the amount of evenly divisible spaces
     int wordGap = spaceCount/wordCount;
+    //set remaining spaces to insert randomly later
+    rSpaces = spaceCount % wordCount;
+    
     for(int i = 1; i < wordGap; i ++){
         space += " ";
     }
@@ -142,16 +126,21 @@ string *getWords(string in){
 //}
 
 int main (int argc, const char * argv[]) {
-    int lineLength = 20;
+    int maxLineLength = 20;
     
+    regex lineLengthToken ("^\\.ll+");
+    regex dotLineToken ("^\\..+");
+    regex numberToken ("^\\.ll\\s((\\d\\d$)|([0-1][0-1][0-9]$|120$))");
+    regex justNumbers ("\\d\\d\\d?");
+    smatch m;
     //Check if user has input file name...
     if(argc < 2){
         cout << "Missing filename.\n\n";
         return 0;
     }
-    //fail if lineLength is not valid (must be no less than 10)
-    if(lineLength < 10){
-        cout << "Line length is too small.\n\n";
+    //fail if maxLineLength is not valid (must be no less than 10)
+    if((maxLineLength < 10) || (maxLineLength > 120)){
+        cout << "Line length is invalid.\n\n";
         return 0;
     }
 
@@ -164,37 +153,57 @@ int main (int argc, const char * argv[]) {
     //Print original data and unformat most of the input.
     if (file.is_open()) {
         while ( getline (file,line) ) {
-            if (regex_match(line,newLineToken) && (isNewParagraph == 0) && (lineNum > 0)) {
+            if (regex_match(line,dotLineToken) && (isNewParagraph == 0)) {
+                if(regex_match(line,numberToken)){
+                    while (regex_search(line,m,justNumbers)) {
+                        rawInput += "<";
+                        for (auto x:m) rawInput += x;
+                        rawInput += ">";
+                        break;
+                    }
+                } else {
+                rawInput += "<p>";
+                isNewParagraph = 1;
+                }
+                continue;
+            } else if(regex_match(line,dotLineToken) && (isNewParagraph == 1)) {
+                if(regex_match(line,numberToken)){
+                    while (regex_search(line,m,justNumbers)) {
+                        rawInput += "<";
+                        for (auto x:m) rawInput += x;
+                        rawInput += ">";
+                        break;
+                    }
+                }
+                continue;
+            } else if (regex_match(line,dotLineToken))  {
+                continue;
+            } else if((line.length() == 0) && (isNewParagraph == 0)){
                 rawInput += "<p>";
                 isNewParagraph = 1;
                 continue;
-            } else if(regex_match(line,newLineToken) && (isNewParagraph == 1)) {
-                continue;
-            } else if (regex_match(line,dotLineToken))  {
+            }else if((line.length() == 0) && (isNewParagraph == 1)){
                 continue;
             }else {
                 rawInput += line + ' ';
                 isNewParagraph = 0;
             }
-            lineNum++;
         }
         file.close();
     } else cout << "Unable to open file";
      string *words = getWords(rawInput);
     
     for(int i = 0; i < wordCount; i++){
-        if(words[i].length() > lineLength)
+        if(words[i].length() > maxLineLength)
         {
-            string *split = splitWord(words[i], lineLength);
-            for(int j=0; j<(sizeof(split)/sizeof(split[0])); j++){
-//                cout << split[j];
-            }
+            splitWord(words[i], maxLineLength);
             
         }
-//        else
-//        cout << words[i] + space;
+        else
+        cout << words[i] + space;
     }
     
+    cout << "\n\nRemaining Spaces: " << rSpaces << "\n";
     //Function to separate words into an array and count spaces.
     
     
