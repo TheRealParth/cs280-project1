@@ -39,29 +39,52 @@ int spaceCount = 0;
 //        }
 
 string *splitWord(string in, int lineLength){
+    lineLength = lineLength - 1;
     int r = in.length() % lineLength;
-    int divider = in.length()/lineLength;
+    int lineCount = in.length()/lineLength;
     
-    string *newWord;
-    if(r>0) newWord = new string[divider + 1];
-    else newWord = new string[divider];
+    cout << lineCount;
     
     
-    for(int i = 0; i < divider-1; i++ ){
-        for(int j = lineLength*(i-1); j < lineLength; j++){
-            newWord[i] += in[j];
-            
-        }
-        if((i % lineLength) == 0) {
-            newWord[i] += "-\n";
+        //if there is 1 character left, it will be appended at the end of
+        //the last line instead of the dash, if there are more add another line.
+        if(r > 1){
+            lineCount++;
         }
         
-    }
-    
-    cout << "\n Remainder: " << r;
-    cout << "\n Divider: " << divider << "\n";
-    
-    return newWord;
+        string *newWord = new string[lineCount];
+        cout << "\nr: " << r;
+        cout << "\nlineCount: " << lineCount << "\n";
+        cout << sizeof(newWord)/sizeof(newWord[0]) << "\n";
+        int pos = 0;
+
+        for(int i = 0; i < lineCount; i++){
+            while(pos < lineLength + (lineLength * i)){
+                //if the position get out of bounds end the loop.
+                if(pos > in.length()){
+                    break;
+                }
+                newWord[i] += in[pos];
+                pos++;
+            }
+            //If there is only 1 letter left, append it to the last line.
+            if((r == 1) && (i == lineCount - 1)){
+                newWord[i] += in[pos];
+            } else if(i != lineCount - 1) {
+                newWord[i] += "-";
+            }
+        }
+        if(r < 1){
+            
+        }
+        
+        cout << "\n Remainder: " << r;
+        cout << "\n Divider: " << lineCount << "\n\n";
+        for(int j=0; j< lineCount; j++){
+                            cout << newWord[j] << "\n";
+        }
+        
+        return newWord;
 }
 
 
@@ -115,7 +138,7 @@ string *getWords(string in){
 }
 
 //string finalOutput(string in){
-//    
+//
 //}
 
 int main (int argc, const char * argv[]) {
@@ -163,13 +186,13 @@ int main (int argc, const char * argv[]) {
         if(words[i].length() > lineLength)
         {
             string *split = splitWord(words[i], lineLength);
-            for(int j=0; j<(sizeof(split[0])/sizeof(split)); j++){
-                cout << split[j];
+            for(int j=0; j<(sizeof(split)/sizeof(split[0])); j++){
+//                cout << split[j];
             }
             
         }
-        else
-        cout << words[i] + space;
+//        else
+//        cout << words[i] + space;
     }
     
     //Function to separate words into an array and count spaces.
