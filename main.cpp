@@ -71,15 +71,12 @@ void splitWord(string in, int lineLength){
     lineLength = lineLength - 1;
     int r = in.length() % lineLength;
     int lineCount = in.length()/lineLength;
-    
-    //if there is 1 character left, it will be appended at the end of
-    //the last line instead of the dash, if there are more add another line.
+
     if(r > 1){
         lineCount++;
     }
     string *newWord = new string[lineCount];
     int pos = 0;
-
     for(int i = 0; i < lineCount; i++){
         while(pos < lineLength + (lineLength * i)){
             //if the position get out of bounds end the loop.
@@ -98,7 +95,8 @@ void splitWord(string in, int lineLength){
     }
     //print the split array
     for(int j=0; j< lineCount; j++){
-      cout << newWord[j] << "\n";
+      cout << newWord[j];
+        if(j != lineCount) cout << "\n";
     }
 }
 
@@ -131,89 +129,6 @@ string *getWords(string in){
     
     return newWords;
 }
-//------------------------------ GET LINE SIZE ---------------------------------
-int getLineSize(string *in, int start, int stop){
-    int size = 0;
-    int i = start;
-    while(i < stop){
-        if(in[i].find("<") < 121){
-            i++;
-            continue;
-        }
-        size += in[i].length();
-        i++;
-    }
-    return size;
-}
-//------------------------------ LINE BUILDER ---------------------------------
-int lineBuilder(string *in, int start, int stop){
-    int gaps = ((stop - start) - 1);
-    int lineSize = 0;
-    int size = 0;
-    string gap = "";
-    int i = start;
-    int check = 0;
-    int isNewParagraph = 0;
-    
-    lineSize = getLineSize(in, start, stop);
-    
-
-    int remainingSpace = maxLineLength - lineSize;
-    float spaces = 0;
-    if(gaps > 0)
-    spaces = (float) remainingSpace / (float) gaps;
-
-//        cout << "start: " << start << "  ";
-//        cout << "stop: " << stop << "   |";
-//    cout << "l: " << lineSize << " ";
-//    cout << "s: " << spaces << " ";
-//    cout << "g: " << gaps << " ";
-//    cout << "r: " << remainingSpace << " |   \n";
-
-    if(spaces > 3) {
-        gap = " ";
-        //SPLIT THE NEXT WORD
-    } else if (spaces == 3){
-        if((remainingSpace % gaps) == 0){
-            gap = "   ";
-        } else {
-            gap = " ";
-            //SPLIT THE NXT WORD
-        }
-    } else if (spaces < 3){
-        for(int i =0; i < spaces; i++){
-            gap += " ";
-        }
-    }
-    check = 0;
-    isNewParagraph = 0;
-    i = start;
-    while(i < stop) {
-        if(in[i].length() > maxLineLength) {
-            splitWord(in[i], maxLineLength);
-            i++;
-            continue;
-        }
-        check = setPl(in[i]);
-        
-        if((check > 0) && (isNewParagraph ==0)) {
-            if(check == 1) cout << "\n\n";
-            if(check == 2) cout << "\n";
-            check = 0;
-            isNewParagraph = 1;
-        } else if ((check > 0) && (isNewParagraph ==1)){
-        } else {
-            isNewParagraph = 0;
-            cout << in[i] << gap;
-        }
-        i++;
-    }
-    if(isNewParagraph == 0)
-//    cout << endl;
-    
-    return stop;
-}
-
 // ------------------------------ MAIN ---------------------------------
 int main (int argc, const char * argv[]) {
     queue<string> q;
@@ -251,9 +166,6 @@ int main (int argc, const char * argv[]) {
                         rawInput += "> ";
                         break;
                     }
-                } else {
-                    rawInput += "<p> ";
-                    isNewParagraph = 1;
                 }
                 continue;
             } else if(regex_match(line,dotLineToken) && (isNewParagraph == 1)) {
@@ -266,7 +178,7 @@ int main (int argc, const char * argv[]) {
                     }
                 }
                 continue;
-            } else if (regex_match(line, dotLineToken))  {
+            } else if (regex_match(line, dotLineToken) && (isNewParagraph == 1))  {
                 continue;
             } else if((line.length() == 0) && (isNewParagraph == 0)){
                 rawInput += "<p> ";
@@ -284,15 +196,46 @@ int main (int argc, const char * argv[]) {
     
     string *words = getWords(rawInput);
     
-    
-    int start = 0;
-    int stop = 0;
-    
-    for(int i = 0; i < wordCount; i++){
-        stop = getLineWords(words, i, 0);
-
-        start = lineBuilder(words, start, stop);
-        i = start;
+    for(int i = 0; i < wordCount; i ++){
+        q.push(words[i]);
+    }
+    int lineSize = 0;
+    while(!q.empty()){
+        lineSize=0;
+        if(setPl(q.front()) == 0){
+            if(q.front().length() > maxLineLength){
+                splitWord(q.front(),maxLineLength);
+                q.pop();
+            } else {
+                while(!q.empty()){
+                    if(setPl(q.front()) == 0){
+                        
+                        lineSize += q.front().length();
+                        cout << q.front();
+                        q.pop();
+                        
+                        if((lineSize + q.front().length()) > maxLineLength) {
+                            cout << endl;
+                            break;
+                        }
+                        cout << " ";
+                      
+                    } else {
+                        cout << endl << endl;
+                        q.pop();
+                        break;
+                    }
+                }
+                
+            }
+        } else {
+            string s = q.front();
+            q.pop();
+            if(s=="<p>"){
+                cout << endl;
+            }
+            
+        }
     }
 
     return 0;
