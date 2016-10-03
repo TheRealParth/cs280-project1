@@ -209,15 +209,16 @@ int main (int argc, const char * argv[]) {
             } else {
                 while(!q.empty()){
                     if(setPl(q.front()) == 0){
-                        
+
                         lineSize += q.front().length();
                         cout << q.front();
                         q.pop();
-                        
                         if((lineSize + q.front().length()) > maxLineLength) {
                             cout << endl;
                             break;
                         }
+
+                        lineSize+= 1;
                         cout << " ";
                       
                     } else {
