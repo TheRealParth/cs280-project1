@@ -107,7 +107,7 @@ string *getWords(string in){
 // ------------------------------ MAIN ---------------------------------
 int main (int argc, const char * argv[]) {
     queue<string> q;
-    queue<string> fq;
+    queue<string> temp;
     int isNewParagraph = 0;
     regex dotLineToken ("^\\..+"); //finds any line that starts with a .
     regex numberToken ("^\\.ll\\s((\\d\\d$)|([0-1][0-1][0-9]$|120$))"); //finds .ll N where N is > 9 but <= 120
@@ -176,8 +176,17 @@ int main (int argc, const char * argv[]) {
         q.push(words[i]);
     }
     int lineSize = 0;
+    int gaps = 0;
+    int spaces = 0;
+    int rSpaces = 0;
+    int lastLine = 0;
+    string gap = " ";
     while(!q.empty()){
         lineSize=0;
+        spaces = 0;
+        gaps = 0;
+        rSpaces = 0;
+        gap = " ";
         if(setPl(q.front()) == 0){
             if(q.front().length() > maxLineLength){
                 cout << splitWord(q.front(),maxLineLength);
@@ -185,23 +194,69 @@ int main (int argc, const char * argv[]) {
             } else {
                 while(!q.empty()){
                     if(setPl(q.front()) == 0){
-
                         lineSize += q.front().length();
-                        cout << q.front();
+                        temp.push(q.front());
                         q.pop();
-                        if((lineSize + q.front().length()) > maxLineLength) {
-                            cout << endl;
+                        if((lineSize + q.front().length()) >= maxLineLength) {
+                            temp.push("\n");
                             break;
                         }
-
                         lineSize+= 1;
-                        cout << " ";
-                      
+                        lastLine = 0;
+                        
                     } else {
-                        cout << endl << endl;
+                        temp.push("\n\n");
+                        lastLine = 1;
                         q.pop();
                         break;
                     }
+                }
+                //print the temp stck here
+                gaps = temp.size() - 1;
+                spaces = (maxLineLength - lineSize) / gaps;
+                rSpaces = maxLineLength - lineSize;
+                string ts = "";
+                string ts1 = "";
+                string ts2 = "";
+                if(spaces >= 1  && lastLine == 0){
+                    if(q.front() == "<p>" || (q.front().find("<") < 120)) continue;
+                    ts = q.front();
+                    int j = 0;
+                    while ( j < (rSpaces % gaps) + ((spaces-1) * gaps) - 2){
+                        ts1 += ts[j];
+                        lineSize++;
+                        j++;
+                    }
+                    while ( j < q.front().length()){
+                        ts2 += ts[j];
+                        j++;
+                    }
+                    q.front() = ts2;
+                    if(lineSize < maxLineLength && ts1.length() > 0)
+                    ts1 += "-";
+                    if(ts1.length() > 1){
+                    string temp1 = temp.back();
+                    temp.back() = ts1;
+                    temp.push(temp1);
+                    }
+//                    temp.push(splitWord(q.front(), (rSpaces % gaps > 0)));
+                    gaps = temp.size() + 1;
+                    spaces = (maxLineLength - lineSize) / gaps;
+                    rSpaces = maxLineLength - lineSize;
+                }
+                if(lastLine ==  0){
+                    for(int i = 0; i < spaces; i ++){
+                        gap += " ";
+                    }
+                }
+                while(!temp.empty()){
+                    if(temp.front() == "\n" || temp.front() == "\n\n") {cout << temp.front(); temp.pop(); continue;}
+                    cout << temp.front();
+                    if(rSpaces > 0 && lastLine == 0) {cout << " "; rSpaces--;}
+                    if(temp.size() > 2) {
+                        cout << gap;
+                    }
+                    temp.pop();
                 }
                 
             }
