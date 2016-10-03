@@ -5,7 +5,6 @@
 //  Created by parth patel on 9/11/16.
 //
 //
-
 #include "main.hpp"
 #include <iostream>
 #include <fstream>
@@ -46,28 +45,8 @@ int setPl(string in){
     }
         return 0;
 }
-// ------------------------------ GET LINE WORDS ---------------------------------
-//Recursively calculates how many words can fit into one line including 1 space per word.
-int getLineWords(string *words, int start = 0, int lineSize = 0){
-    if((start+1) < wordCount){
-        int currSize = words[start].length() + 1 + lineSize;
-        if(currSize > maxLineLength){
-            return start;
-        } else if(currSize == maxLineLength) {
-            return start+1;
-        } else if (words[start+1].find("<") <= 120){
-            return start+1;
-        } else {
-            return getLineWords(words, start+1, currSize);
-        }
-    } else {
-        return start;
-    }
-}
-
-
 // ------------------------------ SPLIT WORDS ---------------------------------
-void splitWord(string in, int lineLength){
+string splitWord(string in, int lineLength){
     lineLength = lineLength - 1;
     int r = in.length() % lineLength;
     int lineCount = in.length()/lineLength;
@@ -94,22 +73,19 @@ void splitWord(string in, int lineLength){
         }
     }
     //print the split array
+    string sWord = "";
     for(int j=0; j< lineCount; j++){
-      cout << newWord[j];
-        if(j != lineCount) cout << "\n";
+      sWord += newWord[j];
+        if(j != lineCount) sWord+= "\n";
     }
+    return sWord;
 }
-
 // ------------------------------ GET WORDS ---------------------------------
 string *getWords(string in){
     smatch sm;
     regex wordReg ("\\s+"); //finds spaces, which we'll use to split up the words
-    
-    int pos = 0;
-    
     sregex_token_iterator reg_end;
-    
-    
+
     int i = 0;
     int tokenCount = 0;
     string tempy = "";
@@ -126,12 +102,12 @@ string *getWords(string in){
         newWords[j] = it->str();
         j++;
     }
-    
     return newWords;
 }
 // ------------------------------ MAIN ---------------------------------
 int main (int argc, const char * argv[]) {
     queue<string> q;
+    queue<string> fq;
     int isNewParagraph = 0;
     regex dotLineToken ("^\\..+"); //finds any line that starts with a .
     regex numberToken ("^\\.ll\\s((\\d\\d$)|([0-1][0-1][0-9]$|120$))"); //finds .ll N where N is > 9 but <= 120
@@ -204,7 +180,7 @@ int main (int argc, const char * argv[]) {
         lineSize=0;
         if(setPl(q.front()) == 0){
             if(q.front().length() > maxLineLength){
-                splitWord(q.front(),maxLineLength);
+                cout << splitWord(q.front(),maxLineLength);
                 q.pop();
             } else {
                 while(!q.empty()){
